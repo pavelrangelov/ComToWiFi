@@ -1,0 +1,190 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MainDialog</class>
+ <widget class="QDialog" name="MainDialog">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>283</width>
+    <height>382</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>MainDialog</string>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout">
+   <item>
+    <layout class="QFormLayout" name="formLayout">
+     <item row="0" column="0">
+      <widget class="QLabel" name="labelVirtualPort">
+       <property name="text">
+        <string>Virtual Port</string>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="1">
+      <widget class="QComboBox" name="comboVirtualPort"/>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <widget class="Line" name="line_2">
+     <property name="orientation">
+      <enum>Qt::Orientation::Horizontal</enum>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <layout class="QFormLayout" name="formLayout_2">
+     <item row="0" column="0">
+      <widget class="QLabel" name="labelHost">
+       <property name="text">
+        <string>Access Point</string>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="1">
+      <widget class="QLineEdit" name="editHost"/>
+     </item>
+     <item row="1" column="0">
+      <widget class="QLabel" name="labelTcpTxPort">
+       <property name="text">
+        <string>TCP Tx Port</string>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="1">
+      <widget class="QLineEdit" name="editTcpTxPort"/>
+     </item>
+     <item row="2" column="0">
+      <widget class="QLabel" name="labelTcpRxPort">
+       <property name="text">
+        <string>TCP Rx Port</string>
+       </property>
+      </widget>
+     </item>
+     <item row="2" column="1">
+      <widget class="QLineEdit" name="editTcpRxPort"/>
+     </item>
+     <item row="3" column="0" colspan="2">
+      <widget class="Line" name="line">
+       <property name="orientation">
+        <enum>Qt::Orientation::Horizontal</enum>
+       </property>
+      </widget>
+     </item>
+     <item row="4" column="0">
+      <widget class="QLabel" name="labelBaudRate">
+       <property name="text">
+        <string>Baud Rate</string>
+       </property>
+      </widget>
+     </item>
+     <item row="4" column="1">
+      <widget class="QComboBox" name="comboBaudrate"/>
+     </item>
+     <item row="5" column="0">
+      <widget class="QLabel" name="labelDataBits">
+       <property name="text">
+        <string>Data Bits</string>
+       </property>
+      </widget>
+     </item>
+     <item row="5" column="1">
+      <widget class="QComboBox" name="comboDataBits"/>
+     </item>
+     <item row="6" column="0">
+      <widget class="QLabel" name="labelStopBits">
+       <property name="text">
+        <string>Stop Bits</string>
+       </property>
+      </widget>
+     </item>
+     <item row="6" column="1">
+      <widget class="QComboBox" name="comboStopBits"/>
+     </item>
+     <item row="7" column="0">
+      <widget class="QLabel" name="labelParity">
+       <property name="text">
+        <string>Parity</string>
+       </property>
+      </widget>
+     </item>
+     <item row="7" column="1">
+      <widget class="QComboBox" name="comboParity"/>
+     </item>
+     <item row="8" column="0">
+      <widget class="QLabel" name="labelFlowControl">
+       <property name="text">
+        <string>Flow Control</string>
+       </property>
+      </widget>
+     </item>
+     <item row="8" column="1">
+      <widget class="QComboBox" name="comboFlowControl"/>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <spacer name="verticalSpacer">
+     <property name="orientation">
+      <enum>Qt::Orientation::Vertical</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>20</width>
+       <height>42</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" name="horizontalLayout">
+     <item>
+      <widget class="QPushButton" name="btnDefault">
+       <property name="text">
+        <string>Reset To Default</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <spacer name="horizontalSpacer">
+       <property name="orientation">
+        <enum>Qt::Orientation::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item>
+      <widget class="QPushButton" name="btnConnect">
+       <property name="text">
+        <string>Connect</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+  </layout>
+ </widget>
+ <tabstops>
+  <tabstop>comboVirtualPort</tabstop>
+  <tabstop>editHost</tabstop>
+  <tabstop>editTcpTxPort</tabstop>
+  <tabstop>editTcpRxPort</tabstop>
+  <tabstop>comboBaudrate</tabstop>
+  <tabstop>comboDataBits</tabstop>
+  <tabstop>comboStopBits</tabstop>
+  <tabstop>comboParity</tabstop>
+  <tabstop>comboFlowControl</tabstop>
+  <tabstop>btnDefault</tabstop>
+  <tabstop>btnConnect</tabstop>
+ </tabstops>
+ <resources/>
+ <connections/>
+</ui>

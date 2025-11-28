@@ -34,6 +34,7 @@ class MainDialog : public QDialog {
         QAction *m_actionQuit;
 
         QStringList getPortNames();
+        QString parsePort(const QString &text);
         void saveSettings();
         void loadSettings();
         void setConnected(bool connected);
@@ -45,5 +46,6 @@ class MainDialog : public QDialog {
 
     private slots:
         void connectToServer();
+        void resetToDefault();
 };
 #endif // MAINDIALOG_H

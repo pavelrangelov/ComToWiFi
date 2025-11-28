@@ -39,34 +39,17 @@ QString MyThread::createSerialPortName(QString name) {
 }
 
 //-----------------------------------------------------------------------------
-bool MyThread::serialConnect(const QString &virtualSerialPortName,
-                             const QSerialPort::BaudRate baudRate,
-                             const QSerialPort::DataBits dataBits,
-                             const QSerialPort::StopBits stopBits,
-                             const QSerialPort::Parity parity,
-                             const QSerialPort::FlowControl flowControl) {
+bool MyThread::serialConnect(const QString &virtualSerialPortName) {
     m_virtualSerialPortName = virtualSerialPortName;
-    m_baudRate = baudRate;
-    m_dataBits = dataBits;
-    m_stopBits = stopBits;
-    m_parity = parity;
-    m_flowControl = flowControl;
 
     m_virtualSerialPort = new QSerialPort(this);
-    /*
     m_virtualSerialPort->setPortName(createSerialPortName(m_virtualSerialPortName));
-    m_virtualSerialPort->setBaudRate(m_baudRate);
-    m_virtualSerialPort->setDataBits(m_dataBits);
-    m_virtualSerialPort->setStopBits(m_stopBits);
-    m_virtualSerialPort->setParity(m_parity);
-    m_virtualSerialPort->setFlowControl(m_flowControl);
+    m_virtualSerialPort->setBaudRate(QSerialPort::Baud115200);
+    m_virtualSerialPort->setDataBits(QSerialPort::Data8);
+    m_virtualSerialPort->setStopBits(QSerialPort::OneStop);
+    m_virtualSerialPort->setParity(QSerialPort::NoParity);
+    m_virtualSerialPort->setFlowControl(QSerialPort::NoFlowControl);
     m_virtualSerialPort->close();
-    */
-    qDebug() << m_virtualSerialPort->baudRate();
-    qDebug() << m_virtualSerialPort->dataBits();
-    qDebug() << m_virtualSerialPort->stopBits();
-    qDebug() << m_virtualSerialPort->parity();
-    qDebug() << m_virtualSerialPort->flowControl();
 
     if (!m_virtualSerialPort->open(QIODevice::ReadWrite)) {
         return false;

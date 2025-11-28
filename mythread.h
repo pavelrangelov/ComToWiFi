@@ -13,12 +13,7 @@ class MyThread : public QThread {
         ~MyThread();
         bool tcpConnect(const QString &host, const int tcpTxPort, const int tcpRxPort);
         void tcpDisconnect();
-        bool serialConnect(const QString &virtualSerialPortName,
-                            const QSerialPort::BaudRate baudRate,
-                            const QSerialPort::DataBits dataBits,
-                            const QSerialPort::StopBits stopBits,
-                            const QSerialPort::Parity parity,
-                            const QSerialPort::FlowControl flowControl);
+        bool serialConnect(const QString &virtualSerialPortName);
         void serialDisconnect();
 
     private:
@@ -29,11 +24,6 @@ class MyThread : public QThread {
         int m_tcpTxPort = 0;
         int m_tcpRxPort = 0;
         QString m_virtualSerialPortName = "";
-        QSerialPort::BaudRate m_baudRate = QSerialPort::Baud115200;
-        QSerialPort::DataBits m_dataBits = QSerialPort::Data8;
-        QSerialPort::StopBits m_stopBits = QSerialPort::OneStop;
-        QSerialPort::Parity m_parity = QSerialPort::NoParity;
-        QSerialPort::FlowControl m_flowControl = QSerialPort::NoFlowControl;
 
         QString createSerialPortName(QString name);
 

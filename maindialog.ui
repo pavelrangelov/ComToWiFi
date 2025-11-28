@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>283</width>
-    <height>382</height>
+    <width>266</width>
+    <height>208</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -67,63 +67,6 @@
      <item row="2" column="1">
       <widget class="QLineEdit" name="editTcpRxPort"/>
      </item>
-     <item row="3" column="0" colspan="2">
-      <widget class="Line" name="line">
-       <property name="orientation">
-        <enum>Qt::Orientation::Horizontal</enum>
-       </property>
-      </widget>
-     </item>
-     <item row="4" column="0">
-      <widget class="QLabel" name="labelBaudRate">
-       <property name="text">
-        <string>Baud Rate</string>
-       </property>
-      </widget>
-     </item>
-     <item row="4" column="1">
-      <widget class="QComboBox" name="comboBaudrate"/>
-     </item>
-     <item row="5" column="0">
-      <widget class="QLabel" name="labelDataBits">
-       <property name="text">
-        <string>Data Bits</string>
-       </property>
-      </widget>
-     </item>
-     <item row="5" column="1">
-      <widget class="QComboBox" name="comboDataBits"/>
-     </item>
-     <item row="6" column="0">
-      <widget class="QLabel" name="labelStopBits">
-       <property name="text">
-        <string>Stop Bits</string>
-       </property>
-      </widget>
-     </item>
-     <item row="6" column="1">
-      <widget class="QComboBox" name="comboStopBits"/>
-     </item>
-     <item row="7" column="0">
-      <widget class="QLabel" name="labelParity">
-       <property name="text">
-        <string>Parity</string>
-       </property>
-      </widget>
-     </item>
-     <item row="7" column="1">
-      <widget class="QComboBox" name="comboParity"/>
-     </item>
-     <item row="8" column="0">
-      <widget class="QLabel" name="labelFlowControl">
-       <property name="text">
-        <string>Flow Control</string>
-       </property>
-      </widget>
-     </item>
-     <item row="8" column="1">
-      <widget class="QComboBox" name="comboFlowControl"/>
-     </item>
     </layout>
    </item>
    <item>
@@ -177,11 +120,6 @@
   <tabstop>editHost</tabstop>
   <tabstop>editTcpTxPort</tabstop>
   <tabstop>editTcpRxPort</tabstop>
-  <tabstop>comboBaudrate</tabstop>
-  <tabstop>comboDataBits</tabstop>
-  <tabstop>comboStopBits</tabstop>
-  <tabstop>comboParity</tabstop>
-  <tabstop>comboFlowControl</tabstop>
   <tabstop>btnDefault</tabstop>
   <tabstop>btnConnect</tabstop>
  </tabstops>

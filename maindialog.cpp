@@ -44,10 +44,19 @@ MainDialog::~MainDialog() {
 }
 
 //-----------------------------------------------------------------------------
-void MainDialog::closeEvent(QCloseEvent *ev) {
-    if (!ev->spontaneous() || !isVisible()) {
+void MainDialog::keyPressEvent(QKeyEvent *ev) {
+    if (ev->key() == Qt::Key_Escape) {
+        ev->accept();
         return;
     }
+    QDialog::keyPressEvent(ev);
+}
+
+//-----------------------------------------------------------------------------
+void MainDialog::closeEvent(QCloseEvent *ev) {
+    //if (!ev->spontaneous() || !isVisible()) {
+    //    return;
+    //}
 
     if (m_trayIcon->isVisible()) {
         hide();

@@ -43,6 +43,7 @@ class MainDialog : public QDialog {
 
     protected:
         virtual void closeEvent(QCloseEvent *ev);
+        virtual void keyPressEvent(QKeyEvent *ev);
 
     private slots:
         void connectToServer();

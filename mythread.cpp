@@ -68,10 +68,10 @@ void MyThread::serialDisconnect() {
 }
 
 //-----------------------------------------------------------------------------
-bool MyThread::tcpConnect(const QString &host, const int tcpTxPort, const int tcpRxPort) {
+bool MyThread::tcpConnect(const QString &host, const int espTxPort, const int espRxPort) {
     m_host = host;
-    m_tcpTxPort = tcpTxPort;
-    m_tcpRxPort = tcpRxPort;
+    m_espTxPort = espTxPort;
+    m_espRxPort = espRxPort;
 
     m_txSocket = new QTcpSocket(this);
     QObject::connect(m_txSocket, &QTcpSocket::connected, this, &MyThread::txSocketConnected);
@@ -85,11 +85,17 @@ bool MyThread::tcpConnect(const QString &host, const int tcpTxPort, const int tc
     QObject::connect(m_rxSocket, &QAbstractSocket::errorOccurred, this, &MyThread::rxSocketError);
     QObject::connect(m_rxSocket, &QAbstractSocket::readyRead, this, &MyThread::rxReadData);
 
-
     m_txSocket->abort();
-    m_txSocket->connectToHost(m_host, m_tcpTxPort);
+    m_txSocket->connectToHost(m_host, m_espRxPort); // We will send data to ESP32 Rx TCP Port
+    if (!m_txSocket->waitForConnected(10000)) {
+        return false;
+    }
+
     m_rxSocket->abort();
-    m_rxSocket->connectToHost(m_host, m_tcpRxPort);
+    m_rxSocket->connectToHost(m_host, m_espTxPort); // We will receive data from ESP Tx TCP Port
+    if (!m_rxSocket->waitForConnected(10000)) {
+        return false;
+    }
 
     return true;
 }

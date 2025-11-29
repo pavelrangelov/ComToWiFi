@@ -4,5 +4,8 @@
         <file>images/stop-32.png</file>
         <file>images/bulb_off.png</file>
         <file>images/bulb_on.png</file>
+        <file>images/connect-32.png</file>
+        <file>images/connect-48.png</file>
+        <file>images/connect-64.png</file>
     </qresource>
 </RCC>

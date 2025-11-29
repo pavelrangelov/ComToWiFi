@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>266</width>
-    <height>208</height>
+    <height>237</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -24,7 +24,11 @@
       </widget>
      </item>
      <item row="0" column="1">
-      <widget class="QComboBox" name="comboVirtualPort"/>
+      <widget class="QComboBox" name="comboVirtualPort">
+       <property name="editable">
+        <bool>true</bool>
+       </property>
+      </widget>
      </item>
     </layout>
    </item>
@@ -48,24 +52,38 @@
       <widget class="QLineEdit" name="editHost"/>
      </item>
      <item row="1" column="0">
-      <widget class="QLabel" name="labelTcpTxPort">
+      <widget class="QLabel" name="labelEspTxPort">
        <property name="text">
-        <string>TCP Tx Port</string>
+        <string>ESP32 Tx Port</string>
        </property>
       </widget>
      </item>
      <item row="1" column="1">
-      <widget class="QLineEdit" name="editTcpTxPort"/>
+      <widget class="QSpinBox" name="spinEspTxPort">
+       <property name="minimum">
+        <number>500</number>
+       </property>
+       <property name="maximum">
+        <number>65535</number>
+       </property>
+      </widget>
      </item>
      <item row="2" column="0">
-      <widget class="QLabel" name="labelTcpRxPort">
+      <widget class="QLabel" name="labelEspRxPort">
        <property name="text">
-        <string>TCP Rx Port</string>
+        <string>ESP32 Rx Port</string>
        </property>
       </widget>
      </item>
      <item row="2" column="1">
-      <widget class="QLineEdit" name="editTcpRxPort"/>
+      <widget class="QSpinBox" name="spinEspRxPort">
+       <property name="minimum">
+        <number>500</number>
+       </property>
+       <property name="maximum">
+        <number>65535</number>
+       </property>
+      </widget>
      </item>
     </layout>
    </item>
@@ -118,8 +136,8 @@
  <tabstops>
   <tabstop>comboVirtualPort</tabstop>
   <tabstop>editHost</tabstop>
-  <tabstop>editTcpTxPort</tabstop>
-  <tabstop>editTcpRxPort</tabstop>
+  <tabstop>spinEspTxPort</tabstop>
+  <tabstop>spinEspRxPort</tabstop>
   <tabstop>btnDefault</tabstop>
   <tabstop>btnConnect</tabstop>
  </tabstops>

@@ -9,14 +9,15 @@
 #include "settings.h"
 
 #define DEFAULT_HOST        "192.168.4.1"
-#define DEFAULT_TCPTXPORT   "8890"
-#define DEFAULT_TCPRXPORT   "8891"
+#define DEFAULT_ESPTXPORT   8890
+#define DEFAULT_ESPRXPORT   8891
 
 //-----------------------------------------------------------------------------
 MainDialog::MainDialog(QWidget *parent) : QDialog(parent), ui(new Ui::MainDialog) {
     ui->setupUi(this);
 
     setWindowTitle(APP_NAME);
+    setWindowIcon(QIcon(":/images/connect-48.png"));
 
     ui->comboVirtualPort->addItems(getPortNames());
 
@@ -97,8 +98,8 @@ void MainDialog::saveSettings() {
     settings.setValue("Geometry", saveGeometry());
     settings.setValue("VirtualPort", parsePort(ui->comboVirtualPort->currentText()));
     settings.setValue("Host", ui->editHost->text());
-    settings.setValue("TcpTxPort", ui->editTcpTxPort->text());
-    settings.setValue("TcpRxPort", ui->editTcpRxPort->text());
+    settings.setValue("TcpTxPort", ui->spinEspTxPort->value());
+    settings.setValue("TcpRxPort", ui->spinEspRxPort->value());
 }
 
 //-----------------------------------------------------------------------------
@@ -107,8 +108,8 @@ void MainDialog::loadSettings() {
     restoreGeometry(settings.value("Geometry").toByteArray());
     ui->comboVirtualPort->setCurrentText(settings.value("VirtualPort", "").toString());
     ui->editHost->setText(settings.value("Host", DEFAULT_HOST).toString());
-    ui->editTcpTxPort->setText(settings.value("TcpTxPort", DEFAULT_TCPTXPORT).toString());
-    ui->editTcpRxPort->setText(settings.value("TcpRxPort", DEFAULT_TCPRXPORT).toString());
+    ui->spinEspTxPort->setValue(settings.value("TcpTxPort", DEFAULT_ESPTXPORT).toUInt());
+    ui->spinEspRxPort->setValue(settings.value("TcpRxPort", DEFAULT_ESPRXPORT).toUInt());
 }
 
 //-----------------------------------------------------------------------------
@@ -130,11 +131,16 @@ void MainDialog::setConnected(bool connected) {
             QMessageBox::critical(this, tr("Error"), tr("Failed to connect to port: %1").arg(ui->comboVirtualPort->currentText()));
             return;
         }
+        if( !m_thread->tcpConnect(ui->editHost->text(), ui->spinEspTxPort->value(), ui->spinEspRxPort->value())) {
+            QMessageBox::critical(this, tr("Error"), tr("Failed to connect to Access Point"));
+            return;
+        }
         ui->btnConnect->setText(tr("Disconnect"));
         ui->btnConnect->setIcon(QIcon(":/images/stop-32.png"));
         ui->btnConnect->setIconSize(QSize(16,16));
         m_trayIcon->setIcon(QIcon(":/images/bulb_on.png"));
     } else {
+        m_thread->tcpDisconnect();
         m_thread->serialDisconnect();
         ui->btnConnect->setText(tr("Connect"));
         ui->btnConnect->setIcon(QIcon(":/images/play-32.png"));
@@ -155,6 +161,7 @@ void MainDialog::createTrayIcon() {
     m_trayIconMenu->addAction(m_actionQuit);
 
     m_trayIcon = new QSystemTrayIcon(this);
+    QObject::connect(m_trayIcon, &QSystemTrayIcon::activated, this, &MainDialog::showNormal);
     m_trayIcon->setContextMenu(m_trayIconMenu);
     m_trayIcon->setIcon(QIcon(":/images/bulb_off.png"));
     m_trayIcon->show();
@@ -163,6 +170,6 @@ void MainDialog::createTrayIcon() {
 //-----------------------------------------------------------------------------
 void MainDialog::resetToDefault() {
     ui->editHost->setText(DEFAULT_HOST);
-    ui->editTcpTxPort->setText(DEFAULT_TCPTXPORT);
-    ui->editTcpRxPort->setText(DEFAULT_TCPRXPORT);
+    ui->spinEspTxPort->setValue(DEFAULT_ESPTXPORT);
+    ui->spinEspRxPort->setValue(DEFAULT_ESPRXPORT);
 }

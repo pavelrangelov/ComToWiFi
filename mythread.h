@@ -11,7 +11,7 @@ class MyThread : public QThread {
     public:
         MyThread(QObject *parent = nullptr);
         ~MyThread();
-        bool tcpConnect(const QString &host, const int tcpTxPort, const int tcpRxPort);
+        bool tcpConnect(const QString &host, const int espTxPort, const int espRxPort);
         void tcpDisconnect();
         bool serialConnect(const QString &virtualSerialPortName);
         void serialDisconnect();
@@ -21,8 +21,8 @@ class MyThread : public QThread {
         QTcpSocket *m_rxSocket = nullptr;
         QSerialPort *m_virtualSerialPort = nullptr;
         QString m_host = "";
-        int m_tcpTxPort = 0;
-        int m_tcpRxPort = 0;
+        int m_espTxPort = 0;
+        int m_espRxPort = 0;
         QString m_virtualSerialPortName = "";
 
         QString createSerialPortName(QString name);

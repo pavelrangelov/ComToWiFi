@@ -7,6 +7,8 @@ qt_standard_project_setup()
 
 qt_add_resources(IMAGE_RESOURCES main.qrc)
 
+set(app_icon_resource_windows, "${CMAKE_CURRENT_SOURCE_DIR}/main.rc")
+
 qt_add_executable(ComToWifi
     WIN32 MACOSX_BUNDLE
     main.cpp
@@ -17,6 +19,7 @@ qt_add_executable(ComToWifi
     mythread.h
     mythread.cpp
     ${IMAGE_RESOURCES}
+    ${app_icon_resource_windows}
 )
 
 target_link_libraries(ComToWifi

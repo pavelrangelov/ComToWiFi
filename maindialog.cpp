@@ -128,11 +128,11 @@ void MainDialog::setConnected(bool connected) {
     m_connected = connected;
     if (m_connected) {
         if (!m_thread->serialConnect(parsePort(ui->comboVirtualPort->currentText()))) {
-            QMessageBox::critical(this, tr("Error"), tr("Failed to connect to port: %1").arg(ui->comboVirtualPort->currentText()));
+            QMessageBox::critical(this, tr("Error"), tr("Failed to open port: %1").arg(ui->comboVirtualPort->currentText()));
             return;
         }
         if( !m_thread->tcpConnect(ui->editHost->text(), ui->spinEspTxPort->value(), ui->spinEspRxPort->value())) {
-            QMessageBox::critical(this, tr("Error"), tr("Failed to connect to Access Point"));
+            QMessageBox::critical(this, tr("Error"), tr("Failed to connect to: %1:%2").arg(ui->editHost->text(), ui->spinEspTxPort->value()));
             return;
         }
         ui->btnConnect->setText(tr("Disconnect"));
@@ -151,9 +151,9 @@ void MainDialog::setConnected(bool connected) {
 
 //-----------------------------------------------------------------------------
 void MainDialog::createTrayIcon() {
-    m_actionRestore = new QAction(tr("&Restore"), this);
+    m_actionRestore = new QAction(QIcon(":/images/restore.png"), tr("&Restore"), this);
     QObject::connect(m_actionRestore, &QAction::triggered, this, &MainDialog::showNormal);
-    m_actionQuit = new QAction(tr("&Quit"), this);
+    m_actionQuit = new QAction(QIcon(":/images/exit.png"), tr("&Quit"), this);
     QObject::connect(m_actionQuit, &QAction::triggered, this, &MainDialog::quitApplication);
 
     m_trayIconMenu = new QMenu(this);

@@ -116,12 +116,12 @@ void MyThread::tcpDisconnect() {
 
 //-----------------------------------------------------------------------------
 void MyThread::txSocketConnected() {
-    qDebug() << "txSocketConnected()";
+    //qDebug() << "txSocketConnected()";
 }
 
 //-----------------------------------------------------------------------------
 void MyThread::txSocketDisconnected() {
-    qDebug() << "txSocketDisconnected()";
+    //qDebug() << "txSocketDisconnected()";
 }
 
 //-----------------------------------------------------------------------------
@@ -136,12 +136,12 @@ void MyThread::txReadData() {
 
 //-----------------------------------------------------------------------------
 void MyThread::rxSocketConnected() {
-    qDebug() << "rxSocketConnected()";
+    //qDebug() << "rxSocketConnected()";
 }
 
 //-----------------------------------------------------------------------------
 void MyThread::rxSocketDisconnected() {
-    qDebug() << "rxSocketDisconnected()";
+    //qDebug() << "rxSocketDisconnected()";
 }
 
 //-----------------------------------------------------------------------------

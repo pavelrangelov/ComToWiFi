@@ -15,7 +15,7 @@ int main(int argc, char *argv[]) {
 
     if (mem.attach()) {
         mem.detach();
-        QMessageBox::information(NULL, NULL, "Application is already running in system tray.");
+        QMessageBox::information(NULL, NULL, "Application is already running\nin the system tray.");
         return -1;
     }
 

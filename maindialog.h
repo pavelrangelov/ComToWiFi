@@ -51,6 +51,7 @@ class MainDialog : public QDialog {
     public slots:
         void tryConnectToHost();
         void connectError(QString errstr);
+        void trayIconActivated(QSystemTrayIcon::ActivationReason reason);
 
     signals:
         void connectToHost(QString &hostName, QString &serialPortName);

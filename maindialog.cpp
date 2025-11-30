@@ -163,11 +163,20 @@ void MainDialog::createTrayIcon() {
     m_trayIconMenu->addAction(m_actionQuit);
 
     m_trayIcon = new QSystemTrayIcon(this);
-    QObject::connect(m_trayIcon, &QSystemTrayIcon::activated, this, &MainDialog::showNormal);
+    QObject::connect(m_trayIcon, &QSystemTrayIcon::activated, this, &MainDialog::trayIconActivated);
     m_trayIcon->setContextMenu(m_trayIconMenu);
     m_trayIcon->setIcon(QIcon(":/images/bulb_off.png"));
     m_trayIcon->show();
 }
+
+//-----------------------------------------------------------------------------
+void MainDialog::trayIconActivated(QSystemTrayIcon::ActivationReason reason) {
+    if (reason == QSystemTrayIcon::Context) {
+        return;
+    }
+    showNormal();
+}
+
 
 //-----------------------------------------------------------------------------
 QString MainDialog::parsePort(const QString &text) {

@@ -4,6 +4,7 @@
 #include <QThread>
 #include <QTcpSocket>
 #include <QSerialPort>
+#include <QTimer>
 
 class MyThread : public QThread {
     Q_OBJECT
@@ -11,7 +12,7 @@ class MyThread : public QThread {
     public:
         MyThread(QObject *parent = nullptr);
         ~MyThread();
-        bool tcpConnect();
+        void tcpConnect();
         void tcpDisconnect();
         bool serialConnect();
         void serialDisconnect();
@@ -21,9 +22,8 @@ class MyThread : public QThread {
         QTcpSocket *m_rxSocket = nullptr;
         QSerialPort *m_virtualSerialPort = nullptr;
         QString m_host = "";
-        int m_espTxPort = 0;
-        int m_espRxPort = 0;
         QString m_virtualSerialPortName = "";
+        QTimer *m_connectTimer;
 
         QString createSerialPortName(QString name);
 
@@ -42,6 +42,7 @@ class MyThread : public QThread {
         void rxReadData();
 
         void serialDataAvailable();
+        void checkForConnected();
 
     public slots:
         void doConnect(QString &hostName, QString &serialPortName);

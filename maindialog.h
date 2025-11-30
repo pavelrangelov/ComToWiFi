@@ -7,6 +7,7 @@
 #include <QSystemTrayIcon>
 #include <QMenu>
 #include <QAction>
+#include <QTimer>
 #include "mythread.h"
 
 QT_BEGIN_NAMESPACE
@@ -32,6 +33,8 @@ class MainDialog : public QDialog {
         QAction *m_actionRestore;
         QAction *m_actionQuit;
         bool m_stateConnected;
+        QTimer *m_progressTimer;
+        int m_progressValue;
 
         QStringList getPortNames();
         QString parsePort(const QString &text);

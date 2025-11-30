@@ -2,12 +2,13 @@
 #include <QSerialPort>
 #include <QDebug>
 #include "mythread.h"
-
-#define ESP_TXPORT 8890
-#define ESP_RXPORT 8891
+#include "settings.h"
 
 //-----------------------------------------------------------------------------
 MyThread::MyThread(QObject *parent) : QThread(parent) {
+    m_connectTimer = new QTimer(this);
+    m_connectTimer->setSingleShot(true);
+    QObject::connect(m_connectTimer, &QTimer::timeout, this, &MyThread::checkForConnected);
 }
 
 //-----------------------------------------------------------------------------
@@ -69,7 +70,7 @@ void MyThread::serialDisconnect() {
 }
 
 //-----------------------------------------------------------------------------
-bool MyThread::tcpConnect() {
+void MyThread::tcpConnect() {
     m_txSocket = new QTcpSocket(this);
     QObject::connect(m_txSocket, &QTcpSocket::connected, this, &MyThread::txSocketConnected);
     QObject::connect(m_txSocket, &QTcpSocket::disconnected, this, &MyThread::txSocketDisconnected);
@@ -83,18 +84,12 @@ bool MyThread::tcpConnect() {
     QObject::connect(m_rxSocket, &QAbstractSocket::readyRead, this, &MyThread::rxReadData);
 
     m_txSocket->abort();
-    m_txSocket->connectToHost(m_host, m_espRxPort); // We will send data to ESP32 Rx TCP Port
-    if (!m_txSocket->waitForConnected(10000)) {
-        return false;
-    }
+    m_txSocket->connectToHost(m_host, ESP_RXPORT); // We will send data to ESP32 Rx TCP Port
 
     m_rxSocket->abort();
-    m_rxSocket->connectToHost(m_host, m_espTxPort); // We will receive data from ESP Tx TCP Port
-    if (!m_rxSocket->waitForConnected(10000)) {
-        return false;
-    }
+    m_rxSocket->connectToHost(m_host, ESP_TXPORT); // We will receive data from ESP Tx TCP Port
 
-    return true;
+    m_connectTimer->start(5000);
 }
 
 //-----------------------------------------------------------------------------
@@ -112,8 +107,32 @@ void MyThread::tcpDisconnect() {
 }
 
 //-----------------------------------------------------------------------------
+void MyThread::checkForConnected() {
+    if (!m_txSocket || !m_rxSocket) {
+        emit connectError(tr("Failed to create sockets"));
+        return;
+    }
+    if (m_txSocket->state() != QAbstractSocket::ConnectedState) {
+        QString errstr = tr("Failed to connect to: %1:%2").arg(m_host).arg(ESP_TXPORT);
+        emit connectError(errstr);
+        return;
+    }
+    if (m_rxSocket->state() != QAbstractSocket::ConnectedState) {
+        qDebug() << "3";
+        QString errstr = tr("Failed to connect to: %1:%2").arg(m_host).arg(ESP_RXPORT);
+        emit connectError(errstr);
+        return;
+    }
+    emit connectError("OK");
+}
+
+//-----------------------------------------------------------------------------
 void MyThread::txSocketConnected() {
-    //qDebug() << "txSocketConnected()";
+    if (m_txSocket->state() == QAbstractSocket::ConnectedState &&
+       (m_rxSocket->state() == QAbstractSocket::ConnectedState)) {
+        m_connectTimer->stop();
+        emit connectError("OK");
+    }
 }
 
 //-----------------------------------------------------------------------------
@@ -123,7 +142,7 @@ void MyThread::txSocketDisconnected() {
 
 //-----------------------------------------------------------------------------
 void MyThread::txSocketError(QAbstractSocket::SocketError error) {
-    qDebug() << "txSocketError: " << error;
+    qDebug() << error;
 }
 
 //-----------------------------------------------------------------------------
@@ -134,7 +153,11 @@ void MyThread::txReadData() {
 
 //-----------------------------------------------------------------------------
 void MyThread::rxSocketConnected() {
-    //qDebug() << "rxSocketConnected()";
+    if (m_txSocket->state() == QAbstractSocket::ConnectedState &&
+        (m_rxSocket->state() == QAbstractSocket::ConnectedState)) {
+        m_connectTimer->stop();
+        emit connectError("OK");
+    }
 }
 
 //-----------------------------------------------------------------------------
@@ -144,7 +167,7 @@ void MyThread::rxSocketDisconnected() {
 
 //-----------------------------------------------------------------------------
 void MyThread::rxSocketError(QAbstractSocket::SocketError error) {
-    qDebug() << "rxSocketError: " << error;
+    qDebug() << error;
 }
 
 //-----------------------------------------------------------------------------
@@ -162,20 +185,15 @@ void MyThread::serialDataAvailable() {
 //-----------------------------------------------------------------------------
 void MyThread::doConnect(QString &hostName, QString &serialPortName) {
     m_host = hostName;
-    m_espTxPort = ESP_TXPORT;
-    m_espRxPort = ESP_RXPORT;
     m_virtualSerialPortName = serialPortName;
 
     if (!serialConnect()) {
-        emit connectError(tr("Failed to open port: %1").arg(m_virtualSerialPortName));
-        return;
-    }
-    if( !tcpConnect()) {
-        emit connectError(tr("Failed to connect to: %1:%2").arg(m_host, m_espTxPort));
+        QString errstr = tr("Failed to open port: %1").arg(m_virtualSerialPortName);
+        emit connectError(errstr);
         return;
     }
 
-    emit connectError("OK");
+    tcpConnect();
 }
 
 //-----------------------------------------------------------------------------

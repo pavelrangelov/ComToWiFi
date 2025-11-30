@@ -8,9 +8,7 @@
 #include "ui_maindialog.h"
 #include "settings.h"
 
-#define DEFAULT_HOST        "192.168.4.1"
-#define DEFAULT_ESPTXPORT   8890
-#define DEFAULT_ESPRXPORT   8891
+#define DEFAULT_HOST "192.168.4.1"
 
 //-----------------------------------------------------------------------------
 MainDialog::MainDialog(QWidget *parent) : QDialog(parent), ui(new Ui::MainDialog) {
@@ -33,6 +31,21 @@ MainDialog::MainDialog(QWidget *parent) : QDialog(parent), ui(new Ui::MainDialog
     QObject::connect(this, &MainDialog::disconnectFromHost, m_thread, &MyThread::doDisconnect);
     QObject::connect(m_thread, &MyThread::connectError, this, &MainDialog::connectError);
     m_thread->start();
+
+    m_progressValue = 0;
+    ui->progressBar->setRange(0,100);
+    ui->progressBar->setValue(0);
+    ui->progressBar->setFormat("");
+
+    m_progressTimer = new QTimer(this);
+    m_progressTimer->setInterval(500);
+    QObject::connect(m_progressTimer, &QTimer::timeout, this, [this](){
+                m_progressValue += CONNECT_TOUT/500;
+                if (m_progressValue > 100) {
+                    m_progressValue = 100;
+                }
+                ui->progressBar->setValue(m_progressValue);
+    });
 
     setConnected(false);
 }
@@ -112,6 +125,7 @@ void MainDialog::tryConnectToHost() {
     if (!m_stateConnected) {
         QString hostName = ui->editHost->text();
         QString serialPortName = parsePort(ui->comboVirtualPort->currentText());
+        m_progressTimer->start();
         emit connectToHost(hostName, serialPortName);
     } else {
         setConnected(false);
@@ -176,4 +190,7 @@ void MainDialog::connectError(QString errstr) {
         setConnected(false);
         QMessageBox::critical(this, tr("Error"), errstr);
     }
+    m_progressTimer->stop();
+    m_progressValue = 0;
+    ui->progressBar->reset();
 }

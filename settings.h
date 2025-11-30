@@ -5,4 +5,9 @@
 #define APP_VERS "0.10"
 #define ORG_NAME "PRangelov"
 
+#define ESP_TXPORT 8890
+#define ESP_RXPORT 8891
+
+#define CONNECT_TOUT 5000
+
 #endif // SETTINGS_H

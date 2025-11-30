@@ -11,9 +11,9 @@ class MyThread : public QThread {
     public:
         MyThread(QObject *parent = nullptr);
         ~MyThread();
-        bool tcpConnect(const QString &host, const int espTxPort, const int espRxPort);
+        bool tcpConnect();
         void tcpDisconnect();
-        bool serialConnect(const QString &virtualSerialPortName);
+        bool serialConnect();
         void serialDisconnect();
 
     private:
@@ -42,6 +42,13 @@ class MyThread : public QThread {
         void rxReadData();
 
         void serialDataAvailable();
+
+    public slots:
+        void doConnect(QString &hostName, QString &serialPortName);
+        void doDisconnect();
+
+    signals:
+        void connectError(QString error);
 };
 
 #endif // MYTHREAD_H

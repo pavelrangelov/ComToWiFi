@@ -25,10 +25,12 @@ MainDialog::MainDialog(QWidget *parent) : QDialog(parent), ui(new Ui::MainDialog
 
     loadSettings();
 
-    connect(ui->btnConnect, &QPushButton::clicked, this, &MainDialog::connectToServer);
-    connect(ui->btnDefault, &QPushButton::clicked, this, &MainDialog::resetToDefault);
+    connect(ui->btnConnect, &QPushButton::clicked, this, &MainDialog::tryConnectToHost);
 
     m_thread = new MyThread(this);
+    QObject::connect(this, &MainDialog::connectToHost, m_thread, &MyThread::doConnect);
+    QObject::connect(this, &MainDialog::disconnectFromHost, m_thread, &MyThread::doDisconnect);
+    QObject::connect(m_thread, &MyThread::connectError, this, &MainDialog::connectError);
     m_thread->start();
 
     setConnected(false);
@@ -89,26 +91,11 @@ QStringList MainDialog::getPortNames() {
 }
 
 //-----------------------------------------------------------------------------
-QString MainDialog::parsePort(const QString &text) {
-    QString portName = text;
-
-    int i = text.indexOf(QChar(0x20));
-
-    if (i != -1) {
-        portName = text.left(i);
-    }
-
-    return portName;
-}
-
-//-----------------------------------------------------------------------------
 void MainDialog::saveSettings() {
     QSettings settings;
     settings.setValue("Geometry", saveGeometry());
     settings.setValue("VirtualPort", parsePort(ui->comboVirtualPort->currentText()));
     settings.setValue("Host", ui->editHost->text());
-    settings.setValue("TcpTxPort", ui->spinEspTxPort->value());
-    settings.setValue("TcpRxPort", ui->spinEspRxPort->value());
 }
 
 //-----------------------------------------------------------------------------
@@ -117,33 +104,24 @@ void MainDialog::loadSettings() {
     restoreGeometry(settings.value("Geometry").toByteArray());
     ui->comboVirtualPort->setCurrentText(settings.value("VirtualPort", "").toString());
     ui->editHost->setText(settings.value("Host", DEFAULT_HOST).toString());
-    ui->spinEspTxPort->setValue(settings.value("TcpTxPort", DEFAULT_ESPTXPORT).toUInt());
-    ui->spinEspRxPort->setValue(settings.value("TcpRxPort", DEFAULT_ESPRXPORT).toUInt());
 }
 
 //-----------------------------------------------------------------------------
-void MainDialog::connectToServer() {
-    if (!m_connected) {
-        m_connected = true;
-        setConnected(true);
+void MainDialog::tryConnectToHost() {
+    if (!m_stateConnected) {
+        QString hostName = ui->editHost->text();
+        QString serialPortName = parsePort(ui->comboVirtualPort->currentText());
+        emit connectToHost(hostName, serialPortName);
     } else {
-        m_connected = false;
         setConnected(false);
+        emit disconnectFromHost();
     }
 }
 
 //-----------------------------------------------------------------------------
 void MainDialog::setConnected(bool connected) {
-    m_connected = connected;
-    if (m_connected) {
-        if (!m_thread->serialConnect(parsePort(ui->comboVirtualPort->currentText()))) {
-            QMessageBox::critical(this, tr("Error"), tr("Failed to open port: %1").arg(ui->comboVirtualPort->currentText()));
-            return;
-        }
-        if( !m_thread->tcpConnect(ui->editHost->text(), ui->spinEspTxPort->value(), ui->spinEspRxPort->value())) {
-            QMessageBox::critical(this, tr("Error"), tr("Failed to connect to: %1:%2").arg(ui->editHost->text(), ui->spinEspTxPort->value()));
-            return;
-        }
+    m_stateConnected = connected;
+    if (m_stateConnected) {
         ui->btnConnect->setText(tr("Disconnect"));
         ui->btnConnect->setIcon(QIcon(":/images/stop-32.png"));
         ui->btnConnect->setIconSize(QSize(16,16));
@@ -177,8 +155,24 @@ void MainDialog::createTrayIcon() {
 }
 
 //-----------------------------------------------------------------------------
-void MainDialog::resetToDefault() {
-    ui->editHost->setText(DEFAULT_HOST);
-    ui->spinEspTxPort->setValue(DEFAULT_ESPTXPORT);
-    ui->spinEspRxPort->setValue(DEFAULT_ESPRXPORT);
+QString MainDialog::parsePort(const QString &text) {
+    QString portName = text;
+
+    int i = text.indexOf(QChar(0x20));
+
+    if (i != -1) {
+        portName = text.left(i);
+    }
+
+    return portName;
+}
+
+//-----------------------------------------------------------------------------
+void MainDialog::connectError(QString errstr) {
+    if (errstr == "OK") {
+        setConnected(true);
+    } else {
+        setConnected(false);
+        QMessageBox::critical(this, tr("Error"), errstr);
+    }
 }

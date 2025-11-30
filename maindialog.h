@@ -27,11 +27,11 @@ class MainDialog : public QDialog {
         MyThread *m_thread;
         QString m_tcpTxPort;
         QString m_tcpRxPort;
-        bool m_connected;
         QSystemTrayIcon *m_trayIcon;
         QMenu *m_trayIconMenu;
         QAction *m_actionRestore;
         QAction *m_actionQuit;
+        bool m_stateConnected;
 
         QStringList getPortNames();
         QString parsePort(const QString &text);
@@ -45,8 +45,12 @@ class MainDialog : public QDialog {
         virtual void closeEvent(QCloseEvent *ev);
         virtual void keyPressEvent(QKeyEvent *ev);
 
-    private slots:
-        void connectToServer();
-        void resetToDefault();
+    public slots:
+        void tryConnectToHost();
+        void connectError(QString errstr);
+
+    signals:
+        void connectToHost(QString &hostName, QString &serialPortName);
+        void disconnectFromHost();
 };
 #endif // MAINDIALOG_H

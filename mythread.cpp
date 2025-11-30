@@ -3,6 +3,9 @@
 #include <QDebug>
 #include "mythread.h"
 
+#define ESP_TXPORT 8890
+#define ESP_RXPORT 8891
+
 //-----------------------------------------------------------------------------
 MyThread::MyThread(QObject *parent) : QThread(parent) {
 }
@@ -39,9 +42,7 @@ QString MyThread::createSerialPortName(QString name) {
 }
 
 //-----------------------------------------------------------------------------
-bool MyThread::serialConnect(const QString &virtualSerialPortName) {
-    m_virtualSerialPortName = virtualSerialPortName;
-
+bool MyThread::serialConnect() {
     m_virtualSerialPort = new QSerialPort(this);
     m_virtualSerialPort->setPortName(createSerialPortName(m_virtualSerialPortName));
     m_virtualSerialPort->setBaudRate(QSerialPort::Baud115200);
@@ -68,11 +69,7 @@ void MyThread::serialDisconnect() {
 }
 
 //-----------------------------------------------------------------------------
-bool MyThread::tcpConnect(const QString &host, const int espTxPort, const int espRxPort) {
-    m_host = host;
-    m_espTxPort = espTxPort;
-    m_espRxPort = espRxPort;
-
+bool MyThread::tcpConnect() {
     m_txSocket = new QTcpSocket(this);
     QObject::connect(m_txSocket, &QTcpSocket::connected, this, &MyThread::txSocketConnected);
     QObject::connect(m_txSocket, &QTcpSocket::disconnected, this, &MyThread::txSocketDisconnected);
@@ -104,13 +101,13 @@ bool MyThread::tcpConnect(const QString &host, const int espTxPort, const int es
 void MyThread::tcpDisconnect() {
     if (m_txSocket) {
         m_txSocket->abort();
-        m_txSocket->waitForDisconnected(500);
-        delete m_txSocket;
+        m_txSocket->close();
+        m_txSocket->deleteLater();
     }
     if (m_rxSocket) {
         m_rxSocket->abort();
-        m_rxSocket->waitForDisconnected(500);
-        delete m_rxSocket;
+        m_rxSocket->close();
+        m_rxSocket->deleteLater();
     }
 }
 
@@ -131,7 +128,8 @@ void MyThread::txSocketError(QAbstractSocket::SocketError error) {
 
 //-----------------------------------------------------------------------------
 void MyThread::txReadData() {
-    // Do nothing
+    QByteArray data = m_txSocket->readAll();
+    data.clear();
 }
 
 //-----------------------------------------------------------------------------
@@ -159,4 +157,29 @@ void MyThread::rxReadData() {
 void MyThread::serialDataAvailable() {
     QByteArray bytes = m_virtualSerialPort->readAll();
     m_txSocket->write(bytes);
+}
+
+//-----------------------------------------------------------------------------
+void MyThread::doConnect(QString &hostName, QString &serialPortName) {
+    m_host = hostName;
+    m_espTxPort = ESP_TXPORT;
+    m_espRxPort = ESP_RXPORT;
+    m_virtualSerialPortName = serialPortName;
+
+    if (!serialConnect()) {
+        emit connectError(tr("Failed to open port: %1").arg(m_virtualSerialPortName));
+        return;
+    }
+    if( !tcpConnect()) {
+        emit connectError(tr("Failed to connect to: %1:%2").arg(m_host, m_espTxPort));
+        return;
+    }
+
+    emit connectError("OK");
+}
+
+//-----------------------------------------------------------------------------
+void MyThread::doDisconnect() {
+    serialDisconnect();
+    tcpDisconnect();
 }

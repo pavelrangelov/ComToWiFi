@@ -16,7 +16,8 @@
 MainDialog::MainDialog(QWidget *parent) : QDialog(parent), ui(new Ui::MainDialog) {
     ui->setupUi(this);
 
-    setWindowTitle(APP_NAME);
+    QString title = QString("%1 - %2").arg(APP_NAME, APP_VERS);
+    setWindowTitle(title);
     setWindowIcon(QIcon(":/images/connect-48.png"));
 
     ui->comboVirtualPort->addItems(getPortNames());

@@ -18,6 +18,7 @@ qt_add_executable(ComToWifi
     settings.h
     mythread.h
     mythread.cpp
+    $<$<BOOL:${WIN32}>:icon.o>
     ${IMAGE_RESOURCES}
     ${app_icon_resource_windows}
 )

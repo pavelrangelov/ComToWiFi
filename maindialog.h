@@ -35,8 +35,8 @@ class MainDialog : public QDialog {
         bool m_stateConnected;
         QTimer *m_progressTimer;
         int m_progressValue;
+        QString m_serialPortName;
 
-        QStringList getPortNames();
         QString parsePort(const QString &text);
         void saveSettings();
         void loadSettings();
@@ -47,6 +47,9 @@ class MainDialog : public QDialog {
     protected:
         virtual void closeEvent(QCloseEvent *ev);
         virtual void keyPressEvent(QKeyEvent *ev);
+
+    private slots:
+        void openSettingsDialog();
 
     public slots:
         void tryConnectToHost();

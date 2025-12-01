@@ -7,6 +7,7 @@
 #include "maindialog.h"
 #include "ui_maindialog.h"
 #include "settings.h"
+#include "settingsdialog.h"
 
 #define DEFAULT_HOST "192.168.4.1"
 
@@ -18,12 +19,13 @@ MainDialog::MainDialog(QWidget *parent) : QDialog(parent), ui(new Ui::MainDialog
     setWindowTitle(title);
     setWindowIcon(QIcon(":/images/connect-48.png"));
 
-    ui->comboVirtualPort->addItems(getPortNames());
-
     createTrayIcon();
 
     loadSettings();
 
+    ui->editSerialPort->setText(m_serialPortName.isEmpty() ? tr("Select Serial Port") : m_serialPortName);
+
+    connect(ui->btnSerialPort, &QPushButton::clicked, this, &MainDialog::openSettingsDialog);
     connect(ui->btnConnect, &QPushButton::clicked, this, &MainDialog::tryConnectToHost);
 
     m_thread = new MyThread(this);
@@ -90,25 +92,10 @@ void MainDialog::quitApplication() {
 }
 
 //-----------------------------------------------------------------------------
-QStringList MainDialog::getPortNames() {
-    QStringList list;
-
-    foreach (const QSerialPortInfo &info, QSerialPortInfo::availablePorts()) {
-        if (info.description().isEmpty()) {
-            list.append(QString("%1").arg(info.portName()));
-        } else {
-            list.append(QString("%1 (%2)").arg(info.portName(), info.description()));
-        }
-    }
-
-    return list;
-}
-
-//-----------------------------------------------------------------------------
 void MainDialog::saveSettings() {
     QSettings settings;
     settings.setValue("Geometry", saveGeometry());
-    settings.setValue("VirtualPort", parsePort(ui->comboVirtualPort->currentText()));
+    settings.setValue("VirtualPort", parsePort(m_serialPortName));
     settings.setValue("Host", ui->editHost->text());
 }
 
@@ -116,7 +103,7 @@ void MainDialog::saveSettings() {
 void MainDialog::loadSettings() {
     QSettings settings;
     restoreGeometry(settings.value("Geometry").toByteArray());
-    ui->comboVirtualPort->setCurrentText(settings.value("VirtualPort", "").toString());
+    m_serialPortName = settings.value("VirtualPort", "").toString();
     ui->editHost->setText(settings.value("Host", DEFAULT_HOST).toString());
 }
 
@@ -124,7 +111,7 @@ void MainDialog::loadSettings() {
 void MainDialog::tryConnectToHost() {
     if (!m_stateConnected) {
         QString hostName = ui->editHost->text();
-        QString serialPortName = parsePort(ui->comboVirtualPort->currentText());
+        QString serialPortName = parsePort(m_serialPortName);
         m_progressTimer->start();
         emit connectToHost(hostName, serialPortName);
     } else {
@@ -149,6 +136,8 @@ void MainDialog::setConnected(bool connected) {
         ui->btnConnect->setIconSize(QSize(16,16));
         m_trayIcon->setIcon(QIcon(":/images/bulb_off.png"));
     }
+    ui->editHost->setEnabled(!m_stateConnected);
+    ui->btnSerialPort->setEnabled(!m_stateConnected);
 }
 
 //-----------------------------------------------------------------------------
@@ -202,4 +191,13 @@ void MainDialog::connectError(QString errstr) {
     m_progressTimer->stop();
     m_progressValue = 0;
     ui->progressBar->reset();
+}
+
+//-----------------------------------------------------------------------------
+void MainDialog::openSettingsDialog() {
+    SettingsDialog dialog(m_serialPortName, this);
+    if (dialog.exec() == QDialog::Accepted) {
+        m_serialPortName = dialog.serialPortName();
+        ui->editSerialPort->setText(m_serialPortName);
+    }
 }

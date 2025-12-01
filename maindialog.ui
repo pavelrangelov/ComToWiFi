@@ -15,33 +15,33 @@
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
-    <layout class="QFormLayout" name="formLayout">
-     <item row="0" column="0">
-      <widget class="QLabel" name="labelVirtualPort">
-       <property name="text">
-        <string>Virtual Port</string>
+    <layout class="QHBoxLayout" name="horizontalLayout_2">
+     <item>
+      <widget class="QLineEdit" name="editSerialPort">
+       <property name="readOnly">
+        <bool>true</bool>
        </property>
       </widget>
      </item>
-     <item row="0" column="1">
-      <widget class="QComboBox" name="comboVirtualPort">
-       <property name="editable">
-        <bool>true</bool>
+     <item>
+      <widget class="QPushButton" name="btnSerialPort">
+       <property name="text">
+        <string>Choose Serial Port</string>
        </property>
       </widget>
      </item>
     </layout>
    </item>
    <item>
-    <layout class="QFormLayout" name="formLayout_2">
-     <item row="0" column="0">
+    <layout class="QHBoxLayout" name="horizontalLayout_3">
+     <item>
       <widget class="QLabel" name="labelHost">
        <property name="text">
         <string>Access Point</string>
        </property>
       </widget>
      </item>
-     <item row="0" column="1">
+     <item>
       <widget class="QLineEdit" name="editHost"/>
      </item>
     </layout>
@@ -80,7 +80,8 @@
   </layout>
  </widget>
  <tabstops>
-  <tabstop>comboVirtualPort</tabstop>
+  <tabstop>editSerialPort</tabstop>
+  <tabstop>btnSerialPort</tabstop>
   <tabstop>editHost</tabstop>
   <tabstop>btnConnect</tabstop>
  </tabstops>

@@ -21,6 +21,7 @@ qt_add_executable(ComToWifi
     $<$<BOOL:${WIN32}>:icon.o>
     ${IMAGE_RESOURCES}
     ${app_icon_resource_windows}
+    settingsdialog.h settingsdialog.cpp settingsdialog.ui
 )
 
 target_link_libraries(ComToWifi

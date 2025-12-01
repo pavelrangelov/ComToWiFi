@@ -14,8 +14,9 @@ class SettingsDialog : public QDialog
     Q_OBJECT
 
     public:
-        explicit SettingsDialog(QString serialPortName = "", QWidget *parent = nullptr);
+        explicit SettingsDialog(QWidget *parent = nullptr);
         ~SettingsDialog();
+        void setSerialPortName(QString &serialPortName);
         QString serialPortName();
 
     private:

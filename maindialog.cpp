@@ -195,7 +195,9 @@ void MainDialog::connectError(QString errstr) {
 
 //-----------------------------------------------------------------------------
 void MainDialog::openSettingsDialog() {
-    SettingsDialog dialog(m_serialPortName, this);
+    SettingsDialog dialog(this);
+    dialog.setSerialPortName(m_serialPortName);
+
     if (dialog.exec() == QDialog::Accepted) {
         m_serialPortName = dialog.serialPortName();
         ui->editSerialPort->setText(m_serialPortName);

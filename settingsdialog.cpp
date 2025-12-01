@@ -4,12 +4,11 @@
 #include "ui_settingsdialog.h"
 
 //-----------------------------------------------------------------------------
-SettingsDialog::SettingsDialog(QString serialPortName, QWidget *parent) : QDialog(parent), ui(new Ui::SettingsDialog)
-{
+SettingsDialog::SettingsDialog(QWidget *parent) : QDialog(parent), ui(new Ui::SettingsDialog) {
     ui->setupUi(this);
     setWindowTitle(tr("Serial Port Settings"));
     ui->comboSerialPort->addItems(getPortNames());
-    ui->comboSerialPort->setCurrentText(serialPortName);
+    ui->comboSerialPort->setEditable(true);
 }
 
 //-----------------------------------------------------------------------------
@@ -30,6 +29,11 @@ QStringList SettingsDialog::getPortNames() {
     }
 
     return list;
+}
+
+//-----------------------------------------------------------------------------
+void SettingsDialog::setSerialPortName(QString &serialPortName) {
+    ui->comboSerialPort->setCurrentText(serialPortName);
 }
 
 //-----------------------------------------------------------------------------

@@ -2,7 +2,7 @@
 #define SETTINGS_H
 
 #define APP_NAME "ComToWiFi"
-#define APP_VERS "0.10"
+#define APP_VERS "0.11"
 #define ORG_NAME "PRangelov"
 
 #define ESP_TXPORT 8890

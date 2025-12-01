@@ -182,15 +182,16 @@ QString MainDialog::parsePort(const QString &text) {
 
 //-----------------------------------------------------------------------------
 void MainDialog::connectError(QString errstr) {
+    m_progressTimer->stop();
+    m_progressValue = 0;
+    ui->progressBar->reset();
+
     if (errstr == "OK") {
         setConnected(true);
     } else {
         setConnected(false);
         QMessageBox::critical(this, tr("Error"), errstr);
     }
-    m_progressTimer->stop();
-    m_progressValue = 0;
-    ui->progressBar->reset();
 }
 
 //-----------------------------------------------------------------------------

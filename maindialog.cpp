@@ -188,6 +188,9 @@ void MainDialog::connectError(QString errstr) {
 
     if (errstr == "OK") {
         setConnected(true);
+    } else
+    if (errstr == "TxDisconnected" || errstr == "RxDisconnected") {
+        setConnected(false);
     } else {
         setConnected(false);
         QMessageBox::critical(this, tr("Error"), errstr);

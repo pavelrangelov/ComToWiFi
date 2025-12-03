@@ -137,7 +137,7 @@ void MyThread::txSocketConnected() {
 
 //-----------------------------------------------------------------------------
 void MyThread::txSocketDisconnected() {
-    emit connectError("Tx Disconnected");
+    emit connectError("TxDisconnected");
 }
 
 //-----------------------------------------------------------------------------
@@ -162,7 +162,7 @@ void MyThread::rxSocketConnected() {
 
 //-----------------------------------------------------------------------------
 void MyThread::rxSocketDisconnected() {
-    emit connectError("Rx Disconnected");
+    emit connectError("RxDisconnected");
 }
 
 //-----------------------------------------------------------------------------

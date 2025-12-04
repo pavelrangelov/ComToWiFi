@@ -26,6 +26,7 @@ class MyThread : public QThread {
         QTimer *m_connectTimer;
 
         QString createSerialPortName(QString name);
+        bool setKeepAlive(QTcpSocket *socket);
 
     protected:
         void run() override;

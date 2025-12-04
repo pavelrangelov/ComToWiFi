@@ -1,6 +1,11 @@
 #include <QApplication>
 #include <QSerialPort>
 #include <QDebug>
+
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <netinet/tcp.h>
+
 #include "mythread.h"
 #include "settings.h"
 
@@ -131,6 +136,8 @@ void MyThread::txSocketConnected() {
     if (m_txSocket->state() == QAbstractSocket::ConnectedState &&
        (m_rxSocket->state() == QAbstractSocket::ConnectedState)) {
         m_connectTimer->stop();
+        setKeepAlive(m_txSocket);
+        setKeepAlive(m_rxSocket);
         emit connectError("OK");
     }
 }
@@ -200,4 +207,24 @@ void MyThread::doConnect(QString &hostName, QString &serialPortName) {
 void MyThread::doDisconnect() {
     serialDisconnect();
     tcpDisconnect();
+}
+
+//-----------------------------------------------------------------------------
+bool MyThread::setKeepAlive(QTcpSocket *socket) {
+    qintptr s = socket->socketDescriptor();
+    if (s == -1) {
+        return false;
+    }
+
+    int enable = 1;
+    int maxidle = 10;
+    int count = 3;
+    int interval = 2;
+
+    setsockopt(s, SOL_SOCKET, SO_KEEPALIVE, &enable, sizeof(enable));
+    setsockopt(s, IPPROTO_TCP, TCP_KEEPIDLE, &maxidle, sizeof(maxidle));
+    setsockopt(s, IPPROTO_TCP, TCP_KEEPCNT, &count, sizeof(count));
+    setsockopt(s, IPPROTO_TCP, TCP_KEEPINTVL, &interval, sizeof(interval));
+
+    return true;
 }

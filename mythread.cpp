@@ -2,9 +2,17 @@
 #include <QSerialPort>
 #include <QDebug>
 
+#ifdef WIN32
+#include <winsock2.h>
+#include <ws2def.h>
+#include <ws2ipdef.h>
+#include <ws2tcpip.h>
+#include <mstcpip.h>
+#else
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <netinet/tcp.h>
+#endif
 
 #include "mythread.h"
 #include "settings.h"
@@ -216,15 +224,29 @@ bool MyThread::setKeepAlive(QTcpSocket *socket) {
         return false;
     }
 
+    #ifdef WIN32
+    struct tcp_keepalive alive;
+    DWORD ret = 0;
+
+    alive.onoff = 1;
+    alive.keepalivetime = 10000;
+    alive.keepaliveinterval = 2000;
+
+    if (WSAIoctl(s, SIO_KEEPALIVE_VALS, &alive, sizeof(alive), NULL, 0, &ret, NULL, NULL) == SOCKET_ERROR) {
+        qDebug() << "WSAIoctl: error";
+        return false;
+    }
+    #else
     int enable = 1;
     int maxidle = 10;
-    int count = 3;
     int interval = 2;
+    int count = 3;
 
     setsockopt(s, SOL_SOCKET, SO_KEEPALIVE, &enable, sizeof(enable));
     setsockopt(s, IPPROTO_TCP, TCP_KEEPIDLE, &maxidle, sizeof(maxidle));
     setsockopt(s, IPPROTO_TCP, TCP_KEEPCNT, &count, sizeof(count));
     setsockopt(s, IPPROTO_TCP, TCP_KEEPINTVL, &interval, sizeof(interval));
+    #endif
 
     return true;
 }

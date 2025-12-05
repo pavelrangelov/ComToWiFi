@@ -240,9 +240,8 @@ void MyThread::ctSocketError(QAbstractSocket::SocketError error) {
 //-----------------------------------------------------------------------------
 void MyThread::ctReadData() {
     QByteArray bytes = m_ctSocket->readAll();
-    qDebug() << bytes;
     if (bytes.length() && bytes == "pong\n") {
-        qDebug() << "Got pong";
+        //qDebug() << "Got pong";
         m_pingCounter = 0;
     }
 }

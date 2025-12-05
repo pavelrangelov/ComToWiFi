@@ -132,6 +132,7 @@ void MyThread::txSocketConnected() {
     if (m_txSocket->state() == QAbstractSocket::ConnectedState &&
        (m_rxSocket->state() == QAbstractSocket::ConnectedState)) {
         m_connectTimer->stop();
+        //m_txSocket->setSocketOption(QAbstractSocket::KeepAliveOption, true);
         emit connectError("OK");
     }
 }
@@ -157,6 +158,7 @@ void MyThread::rxSocketConnected() {
     if (m_txSocket->state() == QAbstractSocket::ConnectedState &&
         (m_rxSocket->state() == QAbstractSocket::ConnectedState)) {
         m_connectTimer->stop();
+        //m_rxSocket->setSocketOption(QAbstractSocket::KeepAliveOption, true);
         emit connectError("OK");
     }
 }

@@ -189,7 +189,12 @@ void MainDialog::connectError(QString errstr) {
     if (errstr == "OK") {
         setConnected(true);
     } else
-    if (errstr == "TxDisconnected" || errstr == "RxDisconnected") {
+    if (errstr == "TxDisconnected" ||
+        errstr == "RxDisconnected"
+        #ifdef USE_CONTROL_SOCKET
+        || errstr == "CtDisconnected"
+        #endif
+        ) {
         setConnected(false);
     } else {
         setConnected(false);

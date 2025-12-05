@@ -10,6 +10,13 @@ MyThread::MyThread(QObject *parent) : QThread(parent) {
     m_connectTimer = new QTimer(this);
     m_connectTimer->setSingleShot(true);
     QObject::connect(m_connectTimer, &QTimer::timeout, this, &MyThread::checkForConnected);
+
+    #ifdef USE_CONTROL_SOCKET
+    m_pingTimer = new QTimer(this);
+    m_pingTimer->setSingleShot(false);
+    QObject::connect(m_pingTimer, &QTimer::timeout, this, &MyThread::sendPing);
+    m_pingCounter = 0;
+    #endif
 }
 
 //-----------------------------------------------------------------------------
@@ -77,18 +84,26 @@ void MyThread::tcpConnect() {
     QObject::connect(m_txSocket, &QTcpSocket::disconnected, this, &MyThread::txSocketDisconnected);
     QObject::connect(m_txSocket, &QAbstractSocket::errorOccurred, this, &MyThread::txSocketError);
     QObject::connect(m_txSocket, &QAbstractSocket::readyRead, this, &MyThread::txReadData);
+    m_txSocket->abort();
+    m_txSocket->connectToHost(m_host, ESP_RXPORT); // We will send data to ESP32 Rx TCP Port
 
     m_rxSocket = new QTcpSocket(this);
     QObject::connect(m_rxSocket, &QTcpSocket::connected, this, &MyThread::rxSocketConnected);
     QObject::connect(m_rxSocket, &QTcpSocket::disconnected, this, &MyThread::rxSocketDisconnected);
     QObject::connect(m_rxSocket, &QAbstractSocket::errorOccurred, this, &MyThread::rxSocketError);
     QObject::connect(m_rxSocket, &QAbstractSocket::readyRead, this, &MyThread::rxReadData);
-
-    m_txSocket->abort();
-    m_txSocket->connectToHost(m_host, ESP_RXPORT); // We will send data to ESP32 Rx TCP Port
-
     m_rxSocket->abort();
     m_rxSocket->connectToHost(m_host, ESP_TXPORT); // We will receive data from ESP Tx TCP Port
+
+    #ifdef USE_CONTROL_SOCKET
+    m_ctSocket = new QTcpSocket(this);
+    QObject::connect(m_ctSocket, &QTcpSocket::connected, this, &MyThread::ctSocketConnected);
+    QObject::connect(m_ctSocket, &QTcpSocket::disconnected, this, &MyThread::ctSocketDisconnected);
+    QObject::connect(m_ctSocket, &QAbstractSocket::errorOccurred, this, &MyThread::ctSocketError);
+    QObject::connect(m_ctSocket, &QAbstractSocket::readyRead, this, &MyThread::ctReadData);
+    m_ctSocket->abort();
+    m_ctSocket->connectToHost(m_host, ESP_CTPORT);
+    #endif
 
     m_connectTimer->start(5000);
 }
@@ -105,6 +120,14 @@ void MyThread::tcpDisconnect() {
         m_rxSocket->close();
         m_rxSocket->deleteLater();
     }
+    #ifdef USE_CONTROL_SOCKET
+    if (m_ctSocket) {
+        m_ctSocket->abort();
+        m_ctSocket->close();
+        m_ctSocket->deleteLater();
+        m_pingTimer->stop();
+    }
+    #endif
 }
 
 //-----------------------------------------------------------------------------
@@ -119,20 +142,29 @@ void MyThread::checkForConnected() {
         return;
     }
     if (m_rxSocket->state() != QAbstractSocket::ConnectedState) {
-        qDebug() << "3";
         QString errstr = tr("Failed to connect to: %1:%2").arg(m_host).arg(ESP_RXPORT);
         emit connectError(errstr);
         return;
     }
+    #ifdef USE_CONTROL_SOCKET
+    if (m_ctSocket->state() != QAbstractSocket::ConnectedState) {
+        QString errstr = tr("Failed to connect to: %1:%2").arg(m_host).arg(ESP_CTPORT);
+        emit connectError(errstr);
+        return;
+    }
+    #endif
     emit connectError("OK");
 }
 
 //-----------------------------------------------------------------------------
 void MyThread::txSocketConnected() {
     if (m_txSocket->state() == QAbstractSocket::ConnectedState &&
-       (m_rxSocket->state() == QAbstractSocket::ConnectedState)) {
+        m_rxSocket->state() == QAbstractSocket::ConnectedState
+        #ifdef USE_CONTROL_SOCKET
+        && m_ctSocket->state() == QAbstractSocket::ConnectedState
+        #endif
+        ) {
         m_connectTimer->stop();
-        //m_txSocket->setSocketOption(QAbstractSocket::KeepAliveOption, true);
         emit connectError("OK");
     }
 }
@@ -156,9 +188,12 @@ void MyThread::txReadData() {
 //-----------------------------------------------------------------------------
 void MyThread::rxSocketConnected() {
     if (m_txSocket->state() == QAbstractSocket::ConnectedState &&
-        (m_rxSocket->state() == QAbstractSocket::ConnectedState)) {
+        m_rxSocket->state() == QAbstractSocket::ConnectedState
+        #ifdef USE_CONTROL_SOCKET
+        && m_ctSocket->state() == QAbstractSocket::ConnectedState
+        #endif
+        ) {
         m_connectTimer->stop();
-        //m_rxSocket->setSocketOption(QAbstractSocket::KeepAliveOption, true);
         emit connectError("OK");
     }
 }
@@ -178,6 +213,52 @@ void MyThread::rxReadData() {
     QByteArray bytes = m_rxSocket->readAll();
     m_virtualSerialPort->write(bytes);
 }
+
+#ifdef USE_CONTROL_SOCKET
+//-----------------------------------------------------------------------------
+void MyThread::ctSocketConnected() {
+    if (m_txSocket->state() == QAbstractSocket::ConnectedState &&
+        m_rxSocket->state() == QAbstractSocket::ConnectedState &&
+        m_ctSocket->state() == QAbstractSocket::ConnectedState) {
+        m_connectTimer->stop();
+        m_pingTimer->start(PING_TIME);
+        m_pingCounter = 0;
+        emit connectError("OK");
+    }
+}
+
+//-----------------------------------------------------------------------------
+void MyThread::ctSocketDisconnected() {
+    emit connectError("CtDisconnected");
+}
+
+//-----------------------------------------------------------------------------
+void MyThread::ctSocketError(QAbstractSocket::SocketError error) {
+    qDebug() << error;
+}
+
+//-----------------------------------------------------------------------------
+void MyThread::ctReadData() {
+    QByteArray bytes = m_ctSocket->readAll();
+    qDebug() << bytes;
+    if (bytes.length() && bytes == "pong\n") {
+        qDebug() << "Got pong";
+        m_pingCounter = 0;
+    }
+}
+
+//-----------------------------------------------------------------------------
+void MyThread::sendPing() {
+    if (m_ctSocket->isValid() && m_ctSocket->isOpen()) {
+        m_ctSocket->write("ping\n");
+        if (++m_pingCounter >= PING_TOUT_COUNT) {
+            emit connectError("CtDisconnected");
+            doDisconnect();
+        }
+    }
+}
+
+#endif
 
 //-----------------------------------------------------------------------------
 void MyThread::serialDataAvailable() {

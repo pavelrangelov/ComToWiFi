@@ -240,16 +240,17 @@ void MyThread::ctSocketError(QAbstractSocket::SocketError error) {
 //-----------------------------------------------------------------------------
 void MyThread::ctReadData() {
     QByteArray bytes = m_ctSocket->readAll();
-    if (bytes.length() && bytes == "pong\n") {
+    if (bytes.length() && bytes.indexOf("pong") != -1) {
         //qDebug() << "Got pong";
         m_pingCounter = 0;
     }
 }
 
+const char *cmd_ping = "{\"cmd\":\"ping\"}\n";
 //-----------------------------------------------------------------------------
 void MyThread::sendPing() {
     if (m_ctSocket->isValid() && m_ctSocket->isOpen()) {
-        m_ctSocket->write("ping\n");
+        m_ctSocket->write(cmd_ping);
         if (++m_pingCounter >= PING_TOUT_COUNT) {
             emit connectError("CtDisconnected");
             doDisconnect();

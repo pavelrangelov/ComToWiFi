@@ -4,7 +4,7 @@
 #define USE_CONTROL_SOCKET
 
 #define APP_NAME "ComToWiFi"
-#define APP_VERS "0.20"
+#define APP_VERS "0.30"
 #define ORG_NAME "PRangelov"
 
 #define ESP_TXPORT 8890

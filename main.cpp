@@ -1,6 +1,7 @@
 #include <QApplication>
 #include <QSharedMemory>
 #include <QMessageBox>
+#include <QStyleFactory>
 #include <QDebug>
 #include "maindialog.h"
 
@@ -9,6 +10,8 @@
 //-----------------------------------------------------------------------------
 int main(int argc, char *argv[]) {
     QApplication a(argc, argv);
+
+    QApplication::setStyle(QStyleFactory::create("Fusion"));
 
     QSharedMemory mem;
     mem.setNativeKey(APP_NAME);

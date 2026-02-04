@@ -54,7 +54,7 @@ QString MyThread::createSerialPortName(QString name) {
 bool MyThread::serialConnect() {
     m_virtualSerialPort = new QSerialPort(this);
     m_virtualSerialPort->setPortName(createSerialPortName(m_virtualSerialPortName));
-    m_virtualSerialPort->setBaudRate(QSerialPort::Baud115200);
+    m_virtualSerialPort->setBaudRate(QSerialPort::Baud38400);
     m_virtualSerialPort->setDataBits(QSerialPort::Data8);
     m_virtualSerialPort->setStopBits(QSerialPort::OneStop);
     m_virtualSerialPort->setParity(QSerialPort::NoParity);
